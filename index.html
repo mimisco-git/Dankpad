@@ -3,429 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dankpad — Join the Waitlist</title>
+<title>Dankpad — Waitlist</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap');
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
   --acid:#C8FF00;
-  --acid-dim:rgba(200,255,0,0.12);
-  --bg:#060608;
-  --s1:#0e0e12;
-  --s2:#16161c;
-  --border:rgba(255,255,255,0.06);
-  --border2:rgba(255,255,255,0.11);
+  --bg:#07070a;
+  --s1:#0f0f14;
+  --s2:#17171e;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
   --text:#f0eee8;
-  --muted:#6a6870;
-  --muted2:#3e3d44;
+  --muted:#5e5d68;
   --success:#44ffb0;
-  --r:10px;
 }
+html,body{min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Syne',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-html,body{
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Instrument Sans',system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ── CANVAS BG ── */
-#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-/* ── LOADER SCREEN ── */
+/* ── LOADER ── */
 #loader{
-  position:fixed;inset:0;z-index:100;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:32px;
-  transition:opacity 0.6s ease, visibility 0.6s ease;
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  transition:opacity .7s ease,visibility .7s ease;
 }
 #loader.hide{opacity:0;visibility:hidden}
-
-.loader-logo{display:flex;align-items:center;gap:14px}
-.loader-name{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:28px;font-weight:800;
-  letter-spacing:-0.5px;
-  color:var(--text);
-}
-.loader-name span{color:var(--acid)}
-
-/* Sequencer bars */
-.seq-bars{display:flex;gap:5px;align-items:flex-end;height:32px}
-.seq-bar{
-  width:3px;border-radius:2px;
-  background:rgba(200,255,0,0.1);
-}
-.seq-status{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:0.18em;
-  color:rgba(200,255,0,0.45);
-  text-transform:uppercase;
-}
+.ld-logo{display:flex;align-items:center;gap:12px}
+.ld-name{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.ld-name span{color:var(--acid)}
+.ld-bars{display:flex;gap:4px;align-items:flex-end;height:28px}
+.ld-bar{width:3px;border-radius:2px;background:rgba(200,255,0,.1)}
+.ld-txt{font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.18em;color:rgba(200,255,0,.4);text-transform:uppercase}
 
 /* ── NAV ── */
 nav{
   position:relative;z-index:10;
   display:flex;align-items:center;justify-content:space-between;
-  padding:22px 32px;
-  border-bottom:1px solid var(--border);
+  padding:20px 32px;
 }
-.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-.nav-logo-name{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:18px;font-weight:800;
-  letter-spacing:-0.3px;color:var(--text);
-}
-.nav-logo-name span{color:var(--acid)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-name{font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.nav-name span{color:var(--acid)}
 .nav-pill{
   display:flex;align-items:center;gap:7px;
   background:var(--s1);border:1px solid var(--border2);
   border-radius:20px;padding:5px 14px 5px 9px;
   font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
 }
-.blink-dot{
-  width:7px;height:7px;border-radius:50%;background:var(--acid);
-  animation:blink 2s ease-in-out infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.blink{width:6px;height:6px;border-radius:50%;background:var(--acid);
+  animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* ── MAIN LAYOUT ── */
-main{
+/* ── CENTER STAGE ── */
+.stage{
   position:relative;z-index:1;
-  max-width:1100px;margin:0 auto;padding:0 24px;
+  min-height:calc(100vh - 64px - 56px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 20px 100px;
+  text-align:center;
 }
 
-/* ── HERO ── */
-.hero{
-  display:grid;
-  grid-template-columns:1fr 420px;
-  gap:48px;align-items:center;
-  padding:80px 0 60px;
-}
-.hero-left{}
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  color:var(--acid);letter-spacing:0.14em;text-transform:uppercase;
-  margin-bottom:24px;opacity:0.8;
-}
-.hero-eyebrow::before{content:'';width:18px;height:1px;background:var(--acid)}
-
-.hero-title{
+/* heading */
+.heading{
   font-family:'DM Serif Display',Georgia,serif;
-  font-size:clamp(44px,6vw,72px);
-  line-height:1.0;letter-spacing:-2px;
-  margin-bottom:20px;
+  font-size:clamp(38px,7vw,68px);
+  line-height:1.05;letter-spacing:-2px;
+  margin-bottom:14px;
 }
-.hero-title em{font-style:italic;color:var(--acid);display:block}
+.heading em{font-style:italic;color:var(--acid)}
+.sub{font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--muted);letter-spacing:.08em;margin-bottom:52px}
 
-.hero-desc{
-  font-size:15px;color:var(--muted);line-height:1.75;
-  max-width:460px;margin-bottom:36px;
-}
-.hero-desc strong{color:var(--text);font-weight:500}
-
-.hero-stats{
-  display:flex;gap:0;
-  border:1px solid var(--border);border-radius:6px;overflow:hidden;
-  max-width:360px;
-}
-.hero-stat{
-  flex:1;padding:14px 16px;
-  border-right:1px solid var(--border);
-}
-.hero-stat:last-child{border-right:none}
-.hero-stat-val{
-  font-family:'JetBrains Mono',monospace;font-size:18px;
-  font-weight:700;color:var(--acid);margin-bottom:2px;
-}
-.hero-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
-
-/* ── FLOW CARD ── */
-.flow-card{
+/* ── CARD ── */
+.card{
+  width:100%;max-width:400px;
   background:var(--s1);
   border:1px solid var(--border2);
-  border-radius:12px;overflow:hidden;
-  position:sticky;top:24px;
+  border-radius:14px;overflow:hidden;
 }
+.card-top{
+  padding:28px 28px 0;
+  text-align:left;
+}
+.step-dots{display:flex;gap:6px;margin-bottom:22px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .35s}
+.dot.done{background:var(--acid)}
+.dot.active{background:var(--acid);box-shadow:0 0 0 3px rgba(200,255,0,.15);width:20px;border-radius:3px}
 
-/* Step header inside card */
-.flow-steps{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  padding:20px 24px;border-bottom:1px solid var(--border);
-}
-.flow-pip{
-  width:26px;height:26px;border-radius:50%;
-  border:1px solid var(--border2);background:var(--s2);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);
-  transition:all 0.35s ease;flex-shrink:0;
-}
-.flow-pip.active{border-color:var(--acid);color:var(--acid);box-shadow:0 0 0 3px rgba(200,255,0,0.1)}
-.flow-pip.done{background:var(--acid);border-color:var(--acid);color:#060608;font-weight:700}
-.flow-line{flex:1;height:1px;background:var(--border2);max-width:36px;transition:background 0.35s}
-.flow-line.done{background:var(--acid)}
+.card-tag{font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--acid);letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:8px}
+.card-title{font-family:'DM Serif Display',Georgia,serif;
+  font-size:20px;line-height:1.2;letter-spacing:-.3px;margin-bottom:4px}
+.card-title em{font-style:italic;color:var(--acid)}
+.card-desc{font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--muted);line-height:1.6;margin-bottom:0}
 
-/* Card body */
-.flow-body{padding:24px}
+.divider{height:1px;background:var(--border);margin:20px 0 0}
+.card-body{padding:20px 28px 28px}
 
-.flow-tag{
-  display:inline-flex;align-items:center;gap:7px;
-  font-family:'JetBrains Mono',monospace;font-size:9px;
-  letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--acid);margin-bottom:10px;opacity:0.8;
-}
-.flow-tag-n{
-  background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);
-  border-radius:3px;padding:1px 5px;font-size:8px;
-}
-.flow-title{
-  font-family:'DM Serif Display',Georgia,serif;
-  font-size:22px;line-height:1.15;letter-spacing:-0.3px;
-  margin-bottom:6px;
-}
-.flow-title em{font-style:italic;color:var(--acid)}
-.flow-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px}
-
-/* Connect rows */
-.connect-btn{
+/* connect rows */
+.con-btn{
   width:100%;display:flex;align-items:center;gap:12px;
-  background:var(--s2);border:1.5px solid var(--border2);
-  border-radius:8px;padding:13px 14px;cursor:pointer;
-  transition:border-color 0.2s,background 0.2s;
-  text-align:left;color:var(--text);margin-bottom:10px;
-}
-.connect-btn:hover{border-color:rgba(200,255,0,0.3);background:rgba(200,255,0,0.02)}
-.connect-btn.ok{border-color:rgba(68,255,176,0.3);background:rgba(68,255,176,0.03)}
-.connect-icon{
-  width:34px;height:34px;border-radius:7px;
-  background:var(--s1);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
-.connect-info{flex:1}
-.connect-label{font-size:13px;font-weight:500;color:var(--text)}
-.connect-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.connect-status{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  padding:3px 9px;border-radius:4px;
-  background:var(--s1);border:1px solid var(--border);color:var(--muted);
-}
-.connect-status.ok{background:rgba(68,255,176,0.1);border-color:rgba(68,255,176,0.25);color:var(--success)}
-
-.addr-chip{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(68,255,176,0.05);border:1px solid rgba(68,255,176,0.15);
-  border-radius:6px;padding:8px 12px;margin-top:-2px;margin-bottom:10px;
-}
-.addr-chip-text{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  color:var(--success);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-
-/* Task list */
-.task-item{
-  display:flex;align-items:center;gap:12px;
-  background:var(--s2);border:1px solid var(--border);
+  background:var(--s2);border:1.5px solid var(--border);
   border-radius:8px;padding:12px 14px;cursor:pointer;
-  transition:border-color 0.2s;margin-bottom:9px;
-  user-select:none;
+  transition:border-color .2s;text-align:left;color:var(--text);margin-bottom:9px;
 }
-.task-item:hover{border-color:var(--border2)}
-.task-item.done{border-color:rgba(68,255,176,0.2);background:rgba(68,255,176,0.03)}
-.task-item.locked{opacity:0.35;pointer-events:none}
-.task-check{
-  width:20px;height:20px;border-radius:50%;
-  border:1.5px solid var(--border2);background:var(--s1);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:all 0.25s;font-size:10px;color:transparent;
-}
-.task-item.done .task-check{background:var(--success);border-color:var(--success);color:#060608;font-weight:700}
-.task-info{flex:1}
-.task-name{font-size:13px;font-weight:500;color:var(--text)}
-.task-item.done .task-name{text-decoration:line-through;color:var(--muted)}
-.task-pts{font-size:11px;color:var(--muted);margin-top:1px;font-family:'JetBrains Mono',monospace}
-.task-cta{
-  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.06em;
-  color:var(--acid);border:1px solid rgba(200,255,0,0.2);
-  border-radius:4px;padding:3px 8px;white-space:nowrap;
-  transition:background 0.2s;
-}
-.task-item.done .task-cta{color:var(--success);border-color:rgba(68,255,176,0.2)}
-.task-item:not(.done):hover .task-cta{background:rgba(200,255,0,0.07)}
+.con-btn:hover{border-color:var(--border2)}
+.con-btn.ok{border-color:rgba(68,255,176,.28)}
+.con-icon{width:32px;height:32px;border-radius:7px;background:var(--s1);
+  border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0}
+.con-label{font-size:13px;font-weight:700;flex:1}
+.con-status{font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:3px 8px;border-radius:4px;background:var(--s1);border:1px solid var(--border);color:var(--muted)}
+.con-status.ok{background:rgba(68,255,176,.08);border-color:rgba(68,255,176,.2);color:var(--success)}
 
-.progress-wrap{margin-bottom:18px}
-.progress-row{display:flex;justify-content:space-between;
+.addr{display:flex;align-items:center;gap:8px;
+  background:rgba(68,255,176,.04);border:1px solid rgba(68,255,176,.14);
+  border-radius:7px;padding:8px 12px;margin-bottom:9px}
+.addr-txt{font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--success);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* tasks */
+.task{display:flex;align-items:center;gap:11px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:11px 13px;cursor:pointer;
+  transition:border-color .2s;margin-bottom:8px;user-select:none}
+.task:hover{border-color:var(--border2)}
+.task.done{border-color:rgba(68,255,176,.2)}
+.task.locked{opacity:.3;pointer-events:none}
+.task-chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);
+  background:var(--s1);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:9px;color:transparent;transition:all .25s;font-weight:700}
+.task.done .task-chk{background:var(--success);border-color:var(--success);color:#07070a}
+.task-name{font-size:13px;font-weight:700;flex:1;text-align:left}
+.task.done .task-name{text-decoration:line-through;color:var(--muted)}
+.task-pts{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--acid);
+  background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.15);
+  border-radius:3px;padding:2px 6px;white-space:nowrap}
+.task.done .task-pts{color:var(--muted);background:var(--s1);border-color:var(--border)}
+
+/* progress */
+.prog-row{display:flex;justify-content:space-between;
   font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:6px}
-.progress-track{height:2px;background:var(--border2);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:var(--acid);border-radius:2px;transition:width 0.5s ease}
+.prog-track{height:1.5px;background:var(--border2);border-radius:2px;overflow:hidden;margin-bottom:18px}
+.prog-fill{height:100%;background:var(--acid);border-radius:2px;transition:width .5s ease}
 
-/* NFT mint preview */
-.nft-row{
-  display:flex;align-items:center;gap:16px;
+/* nft row */
+.nft-row{display:flex;align-items:center;gap:14px;
   background:var(--s2);border:1px solid var(--border);
-  border-radius:8px;padding:16px;margin-bottom:12px;
-}
-.nft-gem{
-  width:56px;height:56px;flex-shrink:0;
-}
-.nft-label{font-size:14px;font-weight:600;margin-bottom:3px;font-family:'Syne',system-ui,sans-serif}
-.nft-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
-.base-badge{
-  background:#1a52f5;border-radius:3px;padding:1px 6px;
-  font-size:9px;color:#fff;margin-right:4px;
-}
+  border-radius:8px;padding:14px;margin-bottom:10px;text-align:left}
+.nft-name{font-size:14px;font-weight:800;margin-bottom:3px}
+.nft-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.base-chip{background:#1a52f5;border-radius:3px;padding:1px 5px;
+  font-size:8px;color:#fff;margin-right:4px}
+.price-line{display:flex;align-items:center;justify-content:space-between;
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:12px 14px;margin-bottom:10px}
+.price-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.price-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--acid)}
+.eligible{display:flex;align-items:center;gap:7px;
+  background:rgba(68,255,176,.05);border:1px solid rgba(68,255,176,.14);
+  border-radius:7px;padding:9px 12px;margin-bottom:14px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--success)}
 
-.price-row{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:8px;padding:13px 16px;margin-bottom:12px;
-}
-.price-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
-.price-val{
-  font-family:'JetBrains Mono',monospace;font-size:20px;
-  font-weight:700;color:var(--acid);
-}
+/* buttons */
+.btn{width:100%;padding:14px;border:none;border-radius:8px;
+  font-family:'Syne',system-ui,sans-serif;font-size:14px;font-weight:800;
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-p{background:var(--acid);color:#07070a}
+.btn-p:hover{background:#d8ff1a;transform:translateY(-1px);box-shadow:0 6px 24px rgba(200,255,0,.2)}
+.btn-p:disabled{background:var(--s2);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border2);margin-top:7px}
+.btn-g:hover{color:var(--text);background:var(--s2)}
 
-.eligible-row{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(68,255,176,0.05);border:1px solid rgba(68,255,176,0.15);
-  border-radius:8px;padding:10px 14px;margin-bottom:16px;
-  font-size:12px;color:var(--success);
-}
-
-/* Buttons */
-.btn{
-  width:100%;padding:14px;border:none;border-radius:8px;
-  font-family:'Instrument Sans',system-ui,sans-serif;
-  font-size:14px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:all 0.2s;letter-spacing:-0.1px;
-}
-.btn-primary{background:var(--acid);color:#060608}
-.btn-primary:hover{background:#d8ff1a;transform:translateY(-1px);box-shadow:0 4px 20px rgba(200,255,0,0.2)}
-.btn-primary:active{transform:translateY(0)}
-.btn-primary:disabled{background:var(--s2);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);margin-top:8px}
-.btn-ghost:hover{color:var(--text);border-color:var(--border2);background:var(--s2)}
-
-/* Success */
-.success-body{padding:32px 24px;text-align:center}
-.success-icon{
-  width:60px;height:60px;border-radius:50%;
-  background:rgba(68,255,176,0.1);border:1px solid rgba(68,255,176,0.25);
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 18px;font-size:24px;
-  animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
+/* success */
+.suc-body{padding:32px 28px;text-align:center}
+.suc-icon{width:56px;height:56px;border-radius:50%;background:rgba(68,255,176,.08);
+  border:1px solid rgba(68,255,176,.22);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;font-size:22px;animation:pop .5s cubic-bezier(.34,1.56,.64,1) forwards}
 @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.success-title{
-  font-family:'DM Serif Display',Georgia,serif;
-  font-size:26px;letter-spacing:-0.5px;margin-bottom:8px;
-}
-.success-title em{color:var(--acid);font-style:italic}
-.success-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:22px}
-.success-pass{
-  display:flex;align-items:center;gap:12px;
-  background:var(--s2);border:1px solid var(--border2);
-  border-radius:8px;padding:14px;margin-bottom:16px;text-align:left;
-}
-.success-pass-label{font-size:13px;font-weight:600;margin-bottom:2px}
-.success-pass-addr{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.suc-title{font-family:'DM Serif Display',Georgia,serif;font-size:24px;letter-spacing:-.4px;margin-bottom:8px}
+.suc-title em{color:var(--acid);font-style:italic}
+.suc-desc{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  line-height:1.7;margin-bottom:20px}
+.suc-pass{display:flex;align-items:center;gap:12px;
+  background:var(--s2);border:1px solid var(--border2);border-radius:8px;
+  padding:12px;margin-bottom:14px;text-align:left}
+.suc-label{font-size:13px;font-weight:800;margin-bottom:2px}
+.suc-addr{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
 .share-row{display:flex;gap:8px}
-.share-btn{
-  flex:1;padding:11px;background:var(--s2);border:1px solid var(--border2);
-  border-radius:8px;color:var(--text);font-family:'Instrument Sans',system-ui,sans-serif;
-  font-size:12px;font-weight:500;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:all 0.2s;
-}
+.share-btn{flex:1;padding:11px;background:var(--s2);border:1px solid var(--border2);
+  border-radius:8px;color:var(--text);font-family:'Syne',system-ui,sans-serif;
+  font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;gap:5px}
 .share-btn:hover{border-color:var(--border2);background:var(--s1)}
 
-/* Perks section below hero */
-.perks{padding:0 0 80px}
-.section-label{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;
-  margin-bottom:16px;display:flex;align-items:center;gap:12px;
-}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.perks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
-.perk{background:var(--s1);padding:24px 20px;transition:background 0.2s;cursor:default}
-.perk:hover{background:var(--s2)}
-.perk-icon{font-size:18px;margin-bottom:12px;display:block}
-.perk-title{font-size:13px;font-weight:600;margin-bottom:5px}
-.perk-desc{font-size:12px;color:var(--muted);line-height:1.65}
-
-/* How strip */
-.how{padding:0 0 80px}
-.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
-.how-step{background:var(--s1);padding:24px 20px}
-.step-num{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  color:var(--acid);margin-bottom:10px;
-}
-.step-title{font-size:13px;font-weight:600;margin-bottom:5px}
-.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
-
-/* Countdown bar */
-.cd-bar{
+/* ── COUNTDOWN FOOTER ── */
+footer{
   position:fixed;bottom:0;left:0;right:0;z-index:10;
   border-top:1px solid var(--border);
-  background:rgba(6,6,8,0.92);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  display:flex;align-items:center;justify-content:center;gap:32px;
-  padding:12px 24px;
+  background:rgba(7,7,10,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;gap:28px;padding:12px 20px;
 }
-.cd-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
-.cd-time{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--text)}
-.cd-sep{color:var(--muted2)}
-.cd-supply{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
-.cd-supply span{color:var(--acid)}
+.cd-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.cd-time{display:flex;align-items:center;gap:4px;
+  font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--text)}
+.cd-sep{color:var(--muted)}
+.cd-sup{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.cd-sup span{color:var(--acid)}
 
-/* Toast */
-.toast{
-  position:fixed;bottom:70px;left:50%;
-  transform:translateX(-50%) translateY(12px);
-  background:var(--s1);border:1px solid var(--border2);
-  border-radius:8px;padding:11px 18px;font-size:13px;color:var(--text);
-  white-space:nowrap;opacity:0;transition:all 0.3s ease;z-index:999;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5);
-}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--s1);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--text);white-space:nowrap;opacity:0;transition:all .3s;z-index:999}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast-dot{width:5px;height:5px;border-radius:50%;background:var(--acid);flex-shrink:0}
 
-/* Confetti */
-.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999}
-.cp{position:absolute;border-radius:1px;animation:cp-fall linear forwards}
-@keyframes cp-fall{
-  from{transform:translateY(-20px) rotate(0deg);opacity:1}
-  to{transform:translateY(100vh) rotate(720deg);opacity:0}
-}
+.cp{position:fixed;border-radius:1px;animation:fall linear forwards;pointer-events:none;z-index:9999}
+@keyframes fall{from{opacity:1;transform:translateY(-10px) rotate(0)}to{opacity:0;transform:translateY(100vh) rotate(720deg)}}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* Responsive */
-@media(max-width:880px){
-  .hero{grid-template-columns:1fr;gap:40px;padding:50px 0 40px}
-  .flow-card{position:static}
-  .perks-grid{grid-template-columns:1fr 1fr}
-  .how-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:560px){
+@media(max-width:480px){
   nav{padding:16px 20px}
-  .perks-grid,.how-grid{grid-template-columns:1fr}
-  .hero-stats{max-width:100%}
+  .heading{font-size:36px}
+  footer{gap:16px}
 }
 </style>
 </head>
@@ -433,551 +239,279 @@ main{
 
 <canvas id="bg"></canvas>
 
-<!-- ── LOADER ── -->
+<!-- LOADER -->
 <div id="loader">
-  <div class="loader-logo">
-    <svg width="44" height="44" viewBox="0 0 100 100" fill="none" id="loader-gem">
-      <rect width="100" height="100" rx="22" fill="#0e0e12"/>
-      <polygon points="50,14 84,33 84,67 50,86 16,67 16,33"
-        fill="none" stroke="rgba(200,255,0,0.35)" stroke-width="1.5"/>
-      <polygon points="50,28 70,39 70,61 50,72 30,61 30,39"
-        fill="rgba(200,255,0,0.09)" stroke="rgba(200,255,0,0.75)" stroke-width="1.8"/>
-      <line x1="50" y1="14" x2="30" y2="39" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="50" y1="14" x2="70" y2="39" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="84" y1="33" x2="70" y2="61" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="84" y1="67" x2="70" y2="61" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="50" y1="86" x2="30" y2="61" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="50" y1="86" x2="70" y2="61" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="16" y1="33" x2="30" y2="39" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <line x1="16" y1="67" x2="30" y2="61" stroke="rgba(200,255,0,0.22)" stroke-width="1"/>
-      <polygon points="50,28 70,39 50,50 30,39" fill="rgba(200,255,0,0.07)"/>
+  <div class="ld-logo">
+    <svg width="36" height="36" viewBox="0 0 100 100" fill="none">
+      <rect width="100" height="100" rx="20" fill="#0f0f14"/>
+      <polygon points="50,14 84,33 84,67 50,86 16,67 16,33" fill="none" stroke="rgba(200,255,0,.3)" stroke-width="1.5"/>
+      <polygon points="50,28 70,39 70,61 50,72 30,61 30,39" fill="rgba(200,255,0,.08)" stroke="rgba(200,255,0,.75)" stroke-width="1.8"/>
+      <line x1="50" y1="14" x2="30" y2="39" stroke="rgba(200,255,0,.2)" stroke-width="1"/>
+      <line x1="50" y1="14" x2="70" y2="39" stroke="rgba(200,255,0,.2)" stroke-width="1"/>
+      <line x1="84" y1="67" x2="70" y2="61" stroke="rgba(200,255,0,.2)" stroke-width="1"/>
+      <line x1="16" y1="67" x2="30" y2="61" stroke="rgba(200,255,0,.2)" stroke-width="1"/>
+      <polygon points="50,28 70,39 50,50 30,39" fill="rgba(200,255,0,.07)"/>
       <circle cx="50" cy="50" r="5.5" fill="#C8FF00"/>
-      <circle cx="50" cy="50" r="2.5" fill="#fff" opacity="0.85"/>
+      <circle cx="50" cy="50" r="2.5" fill="#fff" opacity=".85"/>
     </svg>
-    <div class="loader-name"><span>D</span>ankpad</div>
+    <div class="ld-name"><span>D</span>ankpad</div>
   </div>
-  <div class="seq-bars" id="seqBars"></div>
-  <div class="seq-status" id="seqStatus">Initializing</div>
+  <div class="ld-bars" id="ldBars"></div>
+  <div class="ld-txt" id="ldTxt">Initializing</div>
 </div>
 
-<!-- ── NAV ── -->
+<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
-    <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
-      <rect width="100" height="100" rx="20" fill="#0e0e12"/>
-      <polygon points="50,14 84,33 84,67 50,86 16,67 16,33" fill="none" stroke="rgba(200,255,0,0.3)" stroke-width="1.5"/>
-      <polygon points="50,28 70,39 70,61 50,72 30,61 30,39" fill="rgba(200,255,0,0.09)" stroke="rgba(200,255,0,0.75)" stroke-width="1.8"/>
+    <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+      <rect width="100" height="100" rx="20" fill="#0f0f14"/>
+      <polygon points="50,14 84,33 84,67 50,86 16,67 16,33" fill="none" stroke="rgba(200,255,0,.3)" stroke-width="1.5"/>
+      <polygon points="50,28 70,39 70,61 50,72 30,61 30,39" fill="rgba(200,255,0,.08)" stroke="rgba(200,255,0,.75)" stroke-width="1.8"/>
       <circle cx="50" cy="50" r="5" fill="#C8FF00"/>
-      <circle cx="50" cy="50" r="2" fill="#fff" opacity="0.85"/>
+      <circle cx="50" cy="50" r="2" fill="#fff" opacity=".85"/>
     </svg>
-    <span class="nav-logo-name"><span>D</span>ankpad</span>
+    <span class="nav-name"><span>D</span>ankpad</span>
   </a>
-  <div class="nav-pill">
-    <div class="blink-dot"></div>
-    Waitlist live
-  </div>
+  <div class="nav-pill"><div class="blink"></div>Waitlist open</div>
 </nav>
 
-<!-- ── MAIN ── -->
-<main style="padding-bottom:80px">
+<!-- CENTER STAGE -->
+<div class="stage">
+  <h1 class="heading">Mint your pass.<br><em>Earn everything.</em></h1>
+  <p class="sub">Airdrop launchpad on Base &nbsp;·&nbsp; $0.30 mint &nbsp;·&nbsp; <span id="statMinted" style="color:var(--acid)">1,247</span> minted</p>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-left">
-      <div class="hero-eyebrow">Airdrop launchpad on Base</div>
-      <h1 class="hero-title">
-        Mint your pass.<br>
-        <em>Earn everything.</em>
-      </h1>
-      <p class="hero-desc">
-        <strong>Dankpad</strong> is the fair airdrop launchpad on Base.
-        Mint a Dankpad Pass for $0.30, complete tasks, stack Dank Points,
-        and get first access to every project we launch.
-      </p>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-val">$0.30</div>
-          <div class="hero-stat-label">Mint price</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val" id="mintedStat">1,247</div>
-          <div class="hero-stat-label">Minted</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">45d</div>
-          <div class="hero-stat-label">To launch</div>
-        </div>
-      </div>
+  <!-- Flow card -->
+  <div class="card">
+    <div class="card-top">
+      <div class="step-dots" id="stepDots"></div>
+      <div id="cardTag" class="card-tag"></div>
+      <div id="cardTitle" class="card-title"></div>
+      <div id="cardDesc" class="card-desc"></div>
     </div>
-
-    <!-- Flow card -->
-    <div class="flow-card" id="flowCard">
-      <!-- Steps -->
-      <div class="flow-steps" id="flowSteps"></div>
-      <!-- Body injected by JS -->
-      <div id="flowBody"></div>
-    </div>
+    <div class="divider"></div>
+    <div class="card-body" id="cardBody"></div>
   </div>
+</div>
 
-  <!-- Perks -->
-  <div class="perks">
-    <div class="section-label">What you get</div>
-    <div class="perks-grid">
-      <div class="perk"><span class="perk-icon">◆</span><div class="perk-title">Priority allocations</div><div class="perk-desc">Your Dank Points score determines your share in every airdrop. Higher score, bigger cut.</div></div>
-      <div class="perk"><span class="perk-icon">◈</span><div class="perk-title">Degen Score</div><div class="perk-desc">On-chain Base activity gets scored. Real holders get rewarded. Bots get zero.</div></div>
-      <div class="perk"><span class="perk-icon">◉</span><div class="perk-title">Monthly airdrops</div><div class="perk-desc">Every pass holder gets a guaranteed drop every month from projects we launch.</div></div>
-      <div class="perk"><span class="perk-icon">◎</span><div class="perk-title">Community voting</div><div class="perk-desc">You vote on which projects get listed. Bad projects get rejected before they touch you.</div></div>
-      <div class="perk"><span class="perk-icon">◇</span><div class="perk-title">$DANK token</div><div class="perk-desc">All points convert to $DANK at TGE. Stake to earn platform fees and governance rights.</div></div>
-      <div class="perk"><span class="perk-icon">◐</span><div class="perk-title">Weekly tasks</div><div class="perk-desc">New tasks drop every week on Guild.xyz. Stack points faster than everyone else.</div></div>
-    </div>
-  </div>
-
-  <!-- How it works -->
-  <div class="how">
-    <div class="section-label">How it works</div>
-    <div class="how-grid">
-      <div class="how-step"><div class="step-num">01</div><div class="step-title">Mint your pass</div><div class="step-desc">Connect wallet and X, complete tasks, then mint the Dankpad Pass for $0.30 on Base.</div></div>
-      <div class="how-step"><div class="step-num">02</div><div class="step-title">Complete tasks</div><div class="step-desc">Weekly quests on Guild.xyz, form fills, and holder bonuses earn you Dank Points every week.</div></div>
-      <div class="how-step"><div class="step-num">03</div><div class="step-title">Build your score</div><div class="step-desc">Your Degen Score grows with on-chain activity. Higher score means bigger airdrop allocations.</div></div>
-      <div class="how-step"><div class="step-num">04</div><div class="step-title">Claim airdrops</div><div class="step-desc">When the countdown hits zero, allocations go out. New projects launch every month after that.</div></div>
-    </div>
-  </div>
-
-</main>
-
-<!-- Countdown bar -->
-<div class="cd-bar">
-  <span class="cd-label">Platform launch in</span>
+<!-- FOOTER -->
+<footer>
+  <span class="cd-lbl">Launch in</span>
   <div class="cd-time">
     <span id="cdD">45</span><span class="cd-sep">d</span>
     <span id="cdH">00</span><span class="cd-sep">h</span>
     <span id="cdM">00</span><span class="cd-sep">m</span>
     <span id="cdS">00</span><span class="cd-sep">s</span>
   </div>
-  <span class="cd-supply">Supply: <span id="supplyNum">1,247</span> / 3,600</span>
-</div>
+  <span class="cd-sup">Supply <span id="supNum">1,247</span>/3,600</span>
+</footer>
 
-<!-- Toast -->
-<div class="toast" id="toast">
-  <div class="toast-dot"></div>
-  <span id="toastText"></span>
-</div>
-
-<!-- Confetti container -->
-<div class="confetti-wrap" id="confettiWrap"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* ──────────────────────────────────────────
-   CANVAS BACKGROUND
-────────────────────────────────────────── */
+/* ── CANVAS ── */
 (function(){
-  const cvs = document.getElementById('bg');
-  const ctx = cvs.getContext('2d');
+  const c=document.getElementById('bg'),x=c.getContext('2d');
   let W,H;
-  function resize(){W=cvs.width=innerWidth;H=cvs.height=innerHeight}
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight};
   resize();addEventListener('resize',resize);
-
-  function r(a,b){return a+Math.random()*(b-a)}
-
-  // Particles
-  const pts=[];
-  for(let i=0;i<100;i++) pts.push(mkPt());
-  function mkPt(){
-    return{x:r(0,W),y:r(0,H),vx:r(-0.12,0.12),vy:r(-0.3,-0.05),
-      sz:r(0.6,1.8),life:0,maxL:r(180,380),maxA:r(0.12,0.5)};
-  }
-
-  // Data streaks
-  const streaks=[];
-  for(let i=0;i<12;i++) streaks.push(mkStreak());
-  function mkStreak(){
-    return{x:r(0,W),y:r(-80,H),len:r(50,130),
-      spd:r(1.2,3),a:r(0.05,0.18),w:r(0.5,1.2)};
-  }
-
-  // Hex rings
-  const rings=[];
-  for(let i=0;i<5;i++){
-    const rg={r:r(60,400),spd:r(0.3,0.7),a:r(0.04,0.12),max:r(350,650)};
-    rings.push(rg);
-  }
-  function mkRing(){return{r:50,spd:r(0.3,0.8),a:r(0.05,0.14),max:r(300,600)}}
-
-  // Grid dots
-  let gdots=[];
-  function buildGrid(){
-    gdots=[];
-    for(let x=36;x<W;x+=36) for(let y=36;y<H;y+=36)
-      gdots.push({x,y,ph:r(0,Math.PI*2),spd:r(0.006,0.018)});
-  }
-  buildGrid();
-  addEventListener('resize',buildGrid);
-
-  function hexPath(cx,cy,rad){
-    ctx.beginPath();
-    for(let i=0;i<6;i++){
-      const a=i/6*Math.PI*2-Math.PI/6;
-      i?ctx.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad)
-       :ctx.moveTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad);
-    }
-    ctx.closePath();
-  }
-
-  let tick=0;
+  const r=(a,b)=>a+Math.random()*(b-a);
+  const pts=[]; for(let i=0;i<90;i++) pts.push(mkP());
+  function mkP(){return{x:r(0,W),y:r(0,H),vx:r(-.1,.1),vy:r(-.25,-.04),sz:r(.5,1.8),l:0,ml:r(160,380),ma:r(.1,.45)}}
+  const streaks=[]; for(let i=0;i<10;i++) streaks.push(mkS());
+  function mkS(){return{x:r(-100,W),y:r(-60,H),len:r(50,120),spd:r(1.2,3),a:r(.05,.18),w:r(.5,1.2)}}
+  const rings=[]; for(let i=0;i<5;i++) rings.push({r:r(60,400),spd:r(.3,.7),a:r(.04,.12),max:r(300,600)});
+  function mkR(){return{r:50,spd:r(.25,.8),a:r(.04,.13),max:r(280,580)}}
+  let gd=[];
+  function bGrid(){gd=[];for(let gx=36;gx<W;gx+=36)for(let gy=36;gy<H;gy+=36)gd.push({x:gx,y:gy,ph:r(0,Math.PI*2),sp:r(.006,.018)})}
+  bGrid(); addEventListener('resize',bGrid);
+  function hex(cx,cy,rad){x.beginPath();for(let i=0;i<6;i++){const a=i/6*Math.PI*2-Math.PI/6;i?x.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad):x.moveTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad)}x.closePath()}
   function frame(){
-    ctx.clearRect(0,0,W,H);
-
-    // grid dots
-    gdots.forEach(d=>{
-      d.ph+=d.spd;
-      const a=0.02+Math.abs(Math.sin(d.ph))*0.07;
-      ctx.beginPath();ctx.arc(d.x,d.y,0.7,0,Math.PI*2);
-      ctx.fillStyle=`rgba(200,255,0,${a})`;ctx.fill();
-    });
-
-    // streaks
-    streaks.forEach(s=>{
-      const ang=-Math.PI/4;
-      s.x+=Math.cos(ang)*s.spd; s.y+=Math.sin(ang)*s.spd;
-      if(s.y>H+60){Object.assign(s,mkStreak());s.y=r(-80,0)}
-      const ex=s.x+Math.cos(ang)*s.len,ey=s.y+Math.sin(ang)*s.len;
-      const g=ctx.createLinearGradient(s.x,s.y,ex,ey);
-      g.addColorStop(0,'rgba(200,255,0,0)');
-      g.addColorStop(0.45,`rgba(200,255,0,${s.a})`);
-      g.addColorStop(1,'rgba(200,255,0,0)');
-      ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(ex,ey);
-      ctx.strokeStyle=g;ctx.lineWidth=s.w;ctx.stroke();
-    });
-
-    // hex rings from center
-    const cx=W/2,cy=H*0.42;
-    rings.forEach(rg=>{
-      rg.r+=rg.spd; rg.a*=0.994;
-      if(rg.r>rg.max||rg.a<0.004) Object.assign(rg,mkRing());
-      hexPath(cx,cy,rg.r);
-      ctx.strokeStyle=`rgba(200,255,0,${rg.a})`;
-      ctx.lineWidth=0.8;ctx.stroke();
-    });
-
-    // particles
-    pts.forEach((p,i)=>{
-      p.life++;p.x+=p.vx;p.y+=p.vy;
-      const pct=p.life/p.maxL;
-      p.a=pct<0.1?pct*10*p.maxA:pct>0.8?(1-pct)*5*p.maxA:p.maxA;
-      if(p.life>=p.maxL){Object.assign(pts[i],mkPt())}
-      ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);
-      ctx.fillStyle=`rgba(200,255,0,${p.a})`;ctx.fill();
-    });
-
-    // center glow
-    const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,280);
-    cg.addColorStop(0,'rgba(200,255,0,0.035)');
-    cg.addColorStop(1,'rgba(200,255,0,0)');
-    ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);
-
-    // vignette
-    const vg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.72);
-    vg.addColorStop(0,'rgba(6,6,8,0)');vg.addColorStop(1,'rgba(6,6,8,0.9)');
-    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
-
-    tick++;requestAnimationFrame(frame);
+    x.clearRect(0,0,W,H);
+    gd.forEach(d=>{d.ph+=d.sp;x.beginPath();x.arc(d.x,d.y,.7,0,Math.PI*2);x.fillStyle=`rgba(200,255,0,${.02+Math.abs(Math.sin(d.ph))*.07})`;x.fill()});
+    const ang=-Math.PI/4;
+    streaks.forEach(s=>{s.x+=Math.cos(ang)*s.spd;s.y+=Math.sin(ang)*s.spd;if(s.y>H+60)Object.assign(s,mkS());const ex=s.x+Math.cos(ang)*s.len,ey=s.y+Math.sin(ang)*s.len;const g=x.createLinearGradient(s.x,s.y,ex,ey);g.addColorStop(0,'rgba(200,255,0,0)');g.addColorStop(.45,`rgba(200,255,0,${s.a})`);g.addColorStop(1,'rgba(200,255,0,0)');x.beginPath();x.moveTo(s.x,s.y);x.lineTo(ex,ey);x.strokeStyle=g;x.lineWidth=s.w;x.stroke()});
+    const cx=W/2,cy=H*.42;
+    rings.forEach(rg=>{rg.r+=rg.spd;rg.a*=.994;if(rg.r>rg.max||rg.a<.004)Object.assign(rg,mkR());hex(cx,cy,rg.r);x.strokeStyle=`rgba(200,255,0,${rg.a})`;x.lineWidth=.8;x.stroke()});
+    pts.forEach((p,i)=>{p.l++;p.x+=p.vx;p.y+=p.vy;const pc=p.l/p.ml;const a=pc<.1?pc*10*p.ma:pc>.8?(1-pc)*5*p.ma:p.ma;if(p.l>=p.ml)Object.assign(pts[i],mkP());x.beginPath();x.arc(p.x,p.y,p.sz,0,Math.PI*2);x.fillStyle=`rgba(200,255,0,${a})`;x.fill()});
+    const cg=x.createRadialGradient(cx,cy,0,cx,cy,260);cg.addColorStop(0,'rgba(200,255,0,.03)');cg.addColorStop(1,'rgba(200,255,0,0)');x.fillStyle=cg;x.fillRect(0,0,W,H);
+    const vg=x.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(7,7,10,0)');vg.addColorStop(1,'rgba(7,7,10,.92)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+    requestAnimationFrame(frame);
   }
   frame();
 })();
 
-/* ──────────────────────────────────────────
-   SEQUENCER LOADER
-────────────────────────────────────────── */
+/* ── LOADER ── */
 (function(){
-  const wrap=document.getElementById('seqBars');
-  const status=document.getElementById('seqStatus');
-  const NUM=18;
-  const bars=[];
-  for(let i=0;i<NUM;i++){
-    const b=document.createElement('div');
-    b.className='seq-bar';
-    b.style.cssText=`height:4px;transition:height 0.15s ease,background 0.15s ease`;
-    wrap.appendChild(b);bars.push(b);
-  }
-
-  const statuses=['Initializing','Connecting to Base','Loading contracts','Verifying state','Ready'];
-  let si=0,frame=0;
+  const wrap=document.getElementById('ldBars'),st=document.getElementById('ldTxt');
+  const N=16,bars=[];
+  for(let i=0;i<N;i++){const b=document.createElement('div');b.className='ld-bar';b.style.cssText='height:4px;transition:height .12s ease,background .12s ease';wrap.appendChild(b);bars.push(b)}
+  const msgs=['Initializing','Connecting to Base','Loading contracts','Almost ready'];
+  let f=0,mi=0;
   const iv=setInterval(()=>{
-    frame++;
-    bars.forEach((b,i)=>{
-      const wave=Math.sin((frame*0.18)-(i*0.4));
-      const h=Math.max(3,4+wave*14);
-      const bright=Math.max(0.08,(wave+1)/2*0.85);
-      b.style.height=h+'px';
-      b.style.background=`rgba(200,255,0,${bright})`;
-    });
-    if(frame%22===0&&si<statuses.length-1){si++;status.textContent=statuses[si]}
+    f++;
+    bars.forEach((b,i)=>{const w=Math.sin(f*.18-i*.4);b.style.height=Math.max(3,4+w*13)+'px';b.style.background=`rgba(200,255,0,${Math.max(.07,(w+1)/2*.8)})`});
+    if(f%20===0&&mi<msgs.length-1){mi++;st.textContent=msgs[mi]}
   },40);
-
-  setTimeout(()=>{
-    clearInterval(iv);
-    document.getElementById('loader').classList.add('hide');
-  },2800);
+  setTimeout(()=>{clearInterval(iv);document.getElementById('loader').classList.add('hide')},2600);
 })();
 
-/* ──────────────────────────────────────────
-   FLOW STATE
-────────────────────────────────────────── */
-const S={
-  step:1,
-  wallet:false,walletAddr:'',
-  x:false,xHandle:'',
-  tasks:{follow:false,retweet:false,telegram:false},
+/* ── STATE ── */
+const S={step:1,wallet:false,addr:'',x:false,xh:'',t:{follow:false,retweet:false,telegram:false}};
+const TK=['follow','retweet','telegram'];
+const TL={follow:'https://x.com/dankpad',retweet:'https://x.com/dankpad',telegram:'https://t.me/dankpad'};
+
+function gem(sz=44){return`<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="20" fill="#0f0f14"/><polygon points="50,14 84,33 84,67 50,86 16,67 16,33" fill="none" stroke="rgba(200,255,0,.3)" stroke-width="1.5"/><polygon points="50,28 70,39 70,61 50,72 30,61 30,39" fill="rgba(200,255,0,.08)" stroke="rgba(200,255,0,.75)" stroke-width="1.8"/><line x1="50" y1="14" x2="30" y2="39" stroke="rgba(200,255,0,.2)" stroke-width="1"/><line x1="50" y1="14" x2="70" y2="39" stroke="rgba(200,255,0,.2)" stroke-width="1"/><line x1="84" y1="67" x2="70" y2="61" stroke="rgba(200,255,0,.2)" stroke-width="1"/><line x1="16" y1="67" x2="30" y2="61" stroke="rgba(200,255,0,.2)" stroke-width="1"/><polygon points="50,28 70,39 50,50 30,39" fill="rgba(200,255,0,.07)"/><circle cx="50" cy="50" r="5.5" fill="#C8FF00"/><circle cx="50" cy="50" r="2.5" fill="#fff" opacity=".85"/></svg>`}
+function trunc(a){return a?a.slice(0,6)+'...'+a.slice(-4):a}
+
+const SCREENS={
+  1:{
+    tag:'01 — Connect',
+    title:'Link your <em>accounts</em>',
+    desc:'Wallet + X required to join.',
+    body(){return`
+      <button class="con-btn${S.wallet?' ok':''}" onclick="doWallet()">
+        <div class="con-icon">🦊</div>
+        <div class="con-label">${S.wallet?trunc(S.addr):'Base wallet'}</div>
+        <div class="con-status${S.wallet?' ok':''}">${S.wallet?'✓':'connect'}</div>
+      </button>
+      ${S.wallet?`<div class="addr"><span class="addr-txt">${S.addr}</span><span style="color:var(--success);font-size:12px">✓</span></div>`:''}
+      <button class="con-btn${S.x?' ok':''}" onclick="doX()">
+        <div class="con-icon" style="font-size:14px;font-weight:700">𝕏</div>
+        <div class="con-label">${S.x?'@'+S.xh:'X account'}</div>
+        <div class="con-status${S.x?' ok':''}">${S.x?'✓':'connect'}</div>
+      </button>
+      <button class="btn btn-p" style="margin-top:16px" onclick="go(2)" ${!S.wallet||!S.x?'disabled':''}>Continue →</button>
+    `}
+  },
+  2:{
+    tag:'02 — Tasks',
+    title:'Complete <em>the tasks</em>',
+    desc:'All 3 unlock your mint.',
+    body(){
+      const done=TK.filter(k=>S.t[k]).length;
+      const tasks=[
+        {k:'follow',n:'Follow @dankpad',pts:'+500'},
+        {k:'retweet',n:'Repost the launch',pts:'+750'},
+        {k:'telegram',n:'Join our Telegram',pts:'+250'},
+      ];
+      return tasks.map((t,i)=>{
+        const isDone=S.t[t.k];
+        const locked=i>0&&!S.t[TK[i-1]];
+        return`<div class="task${isDone?' done':''}${locked?' locked':''}" onclick="doTask('${t.k}')">
+          <div class="task-chk">${isDone?'✓':''}</div>
+          <div class="task-name">${t.n}</div>
+          <div class="task-pts">${isDone?'done':t.pts}</div>
+        </div>`;
+      }).join('')+`
+      <div class="prog-row"><span>${done}/3 done</span><span>${Math.round(done/3*100)}%</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${done/3*100}%"></div></div>
+      <button class="btn btn-p" onclick="go(3)" ${done<3?'disabled':''}>${done<3?'Complete all tasks':'Proceed to mint →'}</button>
+      <button class="btn btn-g" onclick="go(1)">← Back</button>`;
+    }
+  },
+  3:{
+    tag:'03 — Mint',
+    title:'Mint your <em>pass</em>',
+    desc:'$0.30 on Base. Yours forever.',
+    body(){return`
+      <div class="nft-row">
+        ${gem(50)}
+        <div>
+          <div class="nft-name">Dankpad Pass</div>
+          <div class="nft-meta"><span class="base-chip">Base</span>ERC-721 · No royalties</div>
+        </div>
+      </div>
+      <div class="price-line">
+        <div><div class="price-lbl">Price</div><div class="price-val">$0.30</div></div>
+        <div style="text-align:right"><div class="price-lbl">Network</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:4px">Base</div></div>
+      </div>
+      <div class="eligible">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#44ffb0" stroke-width="1.2"/><path d="M4 7l2 2 4-4" stroke="#44ffb0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Wallet verified · Tasks complete · Eligible
+      </div>
+      <button class="btn btn-p" onclick="doMint()">Mint Dankpad Pass</button>
+      <button class="btn btn-g" onclick="go(2)">← Back</button>
+    `}
+  },
+  4:{
+    tag:'',title:'',desc:'',
+    body(){return`
+      <div class="suc-body">
+        <div class="suc-icon">✦</div>
+        <div class="suc-title">You're in. <em>Welcome.</em></div>
+        <div class="suc-desc">Pass minted on Base.<br>Tasks drop week 5. Points are stacking.</div>
+        <div class="suc-pass">${gem(40)}<div><div class="suc-label">Dankpad Pass #1248</div><div class="suc-addr">${trunc(S.addr)}</div></div></div>
+        <div class="share-row">
+          <button class="share-btn" onclick="shareX()">𝕏 Share</button>
+          <button class="share-btn" onclick="toast('Coming soon!')">Basescan ↗</button>
+        </div>
+      </div>
+    `}
+  }
 };
-const TASK_KEYS=['follow','retweet','telegram'];
-const TASK_LINKS={follow:'https://x.com/dankpad',retweet:'https://x.com/dankpad',telegram:'https://t.me/dankpad'};
 
-/* ── Gem SVG reusable ── */
-function gemSVG(size=44){
-  return`<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none">
-    <rect width="100" height="100" rx="20" fill="#0e0e12"/>
-    <polygon points="50,14 84,33 84,67 50,86 16,67 16,33" fill="none" stroke="rgba(200,255,0,0.3)" stroke-width="1.5"/>
-    <polygon points="50,28 70,39 70,61 50,72 30,61 30,39" fill="rgba(200,255,0,0.09)" stroke="rgba(200,255,0,0.75)" stroke-width="1.8"/>
-    <line x1="50" y1="14" x2="30" y2="39" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <line x1="50" y1="14" x2="70" y2="39" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <line x1="84" y1="33" x2="70" y2="61" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <line x1="84" y1="67" x2="70" y2="61" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <line x1="50" y1="86" x2="30" y2="61" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <line x1="50" y1="86" x2="70" y2="61" stroke="rgba(200,255,0,0.2)" stroke-width="1"/>
-    <polygon points="50,28 70,39 50,50 30,39" fill="rgba(200,255,0,0.07)"/>
-    <circle cx="50" cy="50" r="5.5" fill="#C8FF00"/>
-    <circle cx="50" cy="50" r="2.5" fill="#fff" opacity="0.85"/>
-  </svg>`;
-}
-
-/* ── Steps indicator ── */
-function renderSteps(){
-  const labels=['Connect','Tasks','Mint'];
-  document.getElementById('flowSteps').innerHTML=labels.map((l,i)=>{
-    const n=i+1;
+function renderDots(){
+  document.getElementById('stepDots').innerHTML=[1,2,3].map(n=>{
     const cls=n<S.step?'done':n===S.step?'active':'';
-    const inner=n<S.step?'✓':n;
-    return (i>0?`<div class="flow-line${n<=S.step?' done':''}"></div>`:'')+
-      `<div class="flow-pip ${cls}" title="${l}">${inner}</div>`;
+    return`<div class="dot ${cls}"></div>`;
   }).join('');
 }
 
-/* ── Step screens ── */
-function screenConnect(){
-  return`
-  <div class="flow-body">
-    <div class="flow-tag"><span class="flow-tag-n">01</span>Connect</div>
-    <div class="flow-title">Link your<br><em>accounts</em></div>
-    <div class="flow-desc">Connect your Base wallet and X account to register.</div>
-
-    <button class="connect-btn${S.wallet?' ok':''}" onclick="doWallet()">
-      <div class="connect-icon">🦊</div>
-      <div class="connect-info">
-        <div class="connect-label">${S.wallet?trunc(S.walletAddr):'Connect Base wallet'}</div>
-        <div class="connect-sub">${S.wallet?'Base mainnet':'MetaMask · Coinbase · WalletConnect'}</div>
-      </div>
-      <div class="connect-status${S.wallet?' ok':''}">${S.wallet?'✓ done':'connect'}</div>
-    </button>
-    ${S.wallet?`<div class="addr-chip"><span class="addr-chip-text">${S.walletAddr}</span><span style="color:var(--success);font-size:13px">✓</span></div>`:''}
-
-    <button class="connect-btn${S.x?' ok':''}" onclick="doX()">
-      <div class="connect-icon" style="font-size:14px;font-weight:700;color:#fff">𝕏</div>
-      <div class="connect-info">
-        <div class="connect-label">${S.x?'@'+S.xHandle:'Connect X account'}</div>
-        <div class="connect-sub">${S.x?'Verified':'Required to verify tasks'}</div>
-      </div>
-      <div class="connect-status${S.x?' ok':''}">${S.x?'✓ done':'connect'}</div>
-    </button>
-
-    <button class="btn btn-primary" style="margin-top:18px"
-      onclick="goStep(2)" ${!S.wallet||!S.x?'disabled':''}>
-      Continue to tasks →
-    </button>
-    <button class="btn btn-ghost" onclick="scrollToHow()">Learn how it works ↓</button>
-  </div>`;
-}
-
-function screenTasks(){
-  const done=TASK_KEYS.filter(k=>S.tasks[k]).length;
-  const total=TASK_KEYS.length;
-  const all=done===total;
-  const tasksHTML=[
-    {key:'follow',name:'Follow @dankpad on X',pts:'+500'},
-    {key:'retweet',name:'Repost the announcement',pts:'+750'},
-    {key:'telegram',name:'Join Dankpad Telegram',pts:'+250'},
-  ].map((t,i)=>{
-    const isDone=S.tasks[t.key];
-    const prevKey=i>0?TASK_KEYS[i-1]:null;
-    const locked=prevKey&&!S.tasks[prevKey];
-    return`<div class="task-item${isDone?' done':''}${locked?' locked':''}" onclick="doTask('${t.key}')">
-      <div class="task-check">${isDone?'✓':''}</div>
-      <div class="task-info">
-        <div class="task-name">${t.name}</div>
-        <div class="task-pts">${t.pts} Dank Points</div>
-      </div>
-      <div class="task-cta">${isDone?'Done':'Do it'}</div>
-    </div>`;
-  }).join('');
-
-  return`
-  <div class="flow-body">
-    <div class="flow-tag"><span class="flow-tag-n">02</span>Tasks</div>
-    <div class="flow-title">Complete<br><em>the tasks</em></div>
-    <div class="flow-desc">All tasks must be done to unlock minting. Each task earns Dank Points.</div>
-
-    ${tasksHTML}
-
-    <div class="progress-wrap" style="margin-top:4px">
-      <div class="progress-row">
-        <span>${done} of ${total} complete</span>
-        <span>${Math.round(done/total*100)}%</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" style="width:${done/total*100}%"></div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" onclick="goStep(3)" ${!all?'disabled':''}>
-      ${all?'Proceed to mint →':'Complete all tasks to continue'}
-    </button>
-    <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
-  </div>`;
-}
-
-function screenMint(){
-  return`
-  <div class="flow-body">
-    <div class="flow-tag"><span class="flow-tag-n">03</span>Mint</div>
-    <div class="flow-title">Mint your<br><em>pass</em></div>
-    <div class="flow-desc">Tasks complete. Mint your Dankpad Pass and secure your place.</div>
-
-    <div class="nft-row">
-      <div class="nft-gem">${gemSVG(56)}</div>
-      <div>
-        <div class="nft-label">Dankpad Pass</div>
-        <div class="nft-meta"><span class="base-badge">Base</span>ERC-721 · No royalties</div>
-      </div>
-    </div>
-
-    <div class="price-row">
-      <div>
-        <div class="price-label">Mint price</div>
-        <div class="price-val">$0.30</div>
-      </div>
-      <div style="text-align:right">
-        <div class="price-label">Network</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);margin-top:4px">Base</div>
-      </div>
-    </div>
-
-    <div class="eligible-row">
-      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-        <circle cx="7.5" cy="7.5" r="6.5" stroke="#44ffb0" stroke-width="1.2"/>
-        <path d="M4.5 7.5l2 2 4-4" stroke="#44ffb0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Wallet verified · Tasks complete · Eligible to mint
-    </div>
-
-    <button class="btn btn-primary" onclick="doMint()">Mint Dankpad Pass</button>
-    <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
-  </div>`;
-}
-
-function screenSuccess(){
-  return`
-  <div class="success-body">
-    <div class="success-icon">✦</div>
-    <div class="success-title">You're in.<br><em>Welcome.</em></div>
-    <p class="success-desc">Your Dankpad Pass is minted on Base.<br>Tasks drop in week 5. Your 1,500 Dank Points are already stacking.</p>
-    <div class="success-pass">
-      ${gemSVG(44)}
-      <div>
-        <div class="success-pass-label">Dankpad Pass #1248</div>
-        <div class="success-pass-addr">${trunc(S.walletAddr)}</div>
-      </div>
-    </div>
-    <div class="share-row">
-      <button class="share-btn" onclick="shareX()">𝕏 Share on X</button>
-      <button class="share-btn" onclick="toast('Basescan link coming soon!')">View on Basescan ↗</button>
-    </div>
-  </div>`;
-}
-
-/* ── Render ── */
 function render(){
-  renderSteps();
-  const screens={1:screenConnect,2:screenTasks,3:screenMint,4:screenSuccess};
-  document.getElementById('flowBody').innerHTML=(screens[S.step]||screenConnect)();
+  const sc=SCREENS[S.step];
+  renderDots();
+  document.getElementById('cardTag').textContent=sc.tag;
+  document.getElementById('cardTitle').innerHTML=sc.title;
+  document.getElementById('cardDesc').textContent=sc.desc;
+  document.getElementById('cardBody').innerHTML=sc.body();
 }
 
-function goStep(n){S.step=n;render()}
+function go(n){S.step=n;render()}
 
-/* ── Actions ── */
 function doWallet(){
   if(S.wallet)return;
-  toast('Connecting wallet...');
-  setTimeout(()=>{
-    S.wallet=true;
-    S.walletAddr='0x'+[...Array(40)].map(()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
-    render();toast('Wallet connected!');
-  },1100);
+  toast('Connecting...');
+  setTimeout(()=>{S.wallet=true;S.addr='0x'+[...Array(40)].map(()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');render();toast('Wallet connected!')},1100);
 }
 function doX(){
   if(S.x)return;
   toast('Redirecting to X...');
-  setTimeout(()=>{S.x=true;S.xHandle='degen_holder';render();toast('@degen_holder connected!')},1300);
+  setTimeout(()=>{S.x=true;S.xh='degen_holder';render();toast('@degen_holder connected!')},1200);
 }
-function doTask(key){
-  if(S.tasks[key])return;
-  const idx=TASK_KEYS.indexOf(key);
-  if(idx>0&&!S.tasks[TASK_KEYS[idx-1]])return;
-  window.open(TASK_LINKS[key]||'#','_blank');
-  toast('Verifying task...');
-  setTimeout(()=>{S.tasks[key]=true;render();toast('Task verified! Points added.')},1600);
+function doTask(k){
+  if(S.t[k])return;
+  const i=TK.indexOf(k);
+  if(i>0&&!S.t[TK[i-1]])return;
+  window.open(TL[k]||'#','_blank');
+  toast('Verifying...');
+  setTimeout(()=>{S.t[k]=true;render();toast('Task verified!')},1500);
 }
 function doMint(){
-  const btn=document.querySelector('.btn-primary');
-  if(btn){btn.textContent='Minting on Base...';btn.disabled=true}
-  toast('Sending transaction...');
-  setTimeout(()=>{S.step=4;render();confetti();bumpSupply()},2000);
+  const b=document.querySelector('.btn-p');
+  if(b){b.textContent='Minting...';b.disabled=true}
+  toast('Sending on Base...');
+  setTimeout(()=>{S.step=4;render();confetti();bump()},1800);
 }
 function shareX(){
-  const t=encodeURIComponent('Just minted my Dankpad Pass — the fair airdrop launchpad on Base 🔥\n\nJoin: dankpad.xyz\n\n@dankpad #Dankpad #Base');
-  window.open('https://twitter.com/intent/tweet?text='+t,'_blank');
-}
-function scrollToHow(){
-  document.querySelector('.how')?.scrollIntoView({behavior:'smooth'});
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent('Just minted my @dankpad Pass on Base 🔥\n\ndankpad.xyz #Dankpad #Base'),'_blank');
 }
 
-/* ── Toast ── */
-let toastTimer;
-function toast(msg){
-  const el=document.getElementById('toast');
-  document.getElementById('toastText').textContent=msg;
-  el.classList.add('on');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('on'),3000);
-}
+/* ── TOAST ── */
+let tt;
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2800)}
 
-/* ── Confetti ── */
+/* ── CONFETTI ── */
 function confetti(){
-  const wrap=document.getElementById('confettiWrap');
-  const cols=['#C8FF00','#44ffb0','#ffffff','#ffd44e','#ff8c4e'];
-  for(let i=0;i<70;i++){
+  const cols=['#C8FF00','#44ffb0','#fff','#ffd44e'];
+  for(let i=0;i<65;i++){
     const p=document.createElement('div');p.className='cp';
-    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;
-      background:${cols[Math.floor(Math.random()*cols.length)]};
-      width:${Math.random()*7+3}px;height:${Math.random()*7+3}px;
-      border-radius:${Math.random()>.5?'50%':'2px'};
-      animation-duration:${Math.random()*2+1.4}s;
-      animation-delay:${Math.random()*.9}s`;
-    wrap.appendChild(p);
-    setTimeout(()=>p.remove(),4000);
+    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;width:${Math.random()*6+3}px;height:${Math.random()*6+3}px;background:${cols[~~(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*2+1.4}s;animation-delay:${Math.random()*.8}s`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),4000);
   }
 }
 
-/* ── Countdown ── */
-const END=Date.now()+45*24*60*60*1000;
+/* ── COUNTDOWN ── */
+const END=Date.now()+45*24*60*60*1e3;
 function tick(){
   const d=Math.max(0,END-Date.now());
   document.getElementById('cdD').textContent=String(Math.floor(d/86400000)).padStart(2,'0');
@@ -987,19 +521,11 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
-/* ── Supply ticker ── */
+/* ── SUPPLY ── */
 let supply=1247;
-function bumpSupply(){
-  supply++;
-  document.getElementById('supplyNum').textContent=supply.toLocaleString();
-  document.getElementById('mintedStat').textContent=supply.toLocaleString();
-}
-setInterval(()=>{if(Math.random()>.6)bumpSupply()},5000);
+function bump(){supply++;['supNum','statMinted'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=supply.toLocaleString()})}
+setInterval(()=>{if(Math.random()>.65)bump()},5000);
 
-/* ── Helper ── */
-function trunc(a){return a?a.slice(0,6)+'...'+a.slice(-4):a}
-
-/* ── Init ── */
 render();
 </script>
 </body>
