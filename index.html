@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dankpad — Join the Waitlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0B0B0A;
+  --surface:  #141413;
+  --surface2: #1C1C1B;
+  --border:   rgba(255,255,255,0.06);
+  --border2:  rgba(255,255,255,0.12);
+  --accent:   #D4FF4E;
+  --accent2:  #bfeb38;
+  --text:     #F0EFE8;
+  --muted:    #6B6A63;
+  --muted2:   #4A4944;
+  --danger:   #FF5F5F;
+  --success:  #4EFFB4;
+  --r:        10px;
+  --r-sm:     6px;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle dot grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -180px; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(212,255,78,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Nav */
+nav {
+  position: relative; z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 9px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.logo-mark {
+  width: 26px; height: 26px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0B0B0A;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nav-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px 5px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  gap: 7px;
+}
+.pill-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  animation: blink 2.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* Main layout */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Step indicator */
+.steps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fade-in 0.5s ease 0.1s forwards;
+}
+.step-pip {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+.step-pip.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0B0B0A;
+  font-weight: 700;
+}
+.step-pip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,255,78,0.12);
+}
+.step-line {
+  width: 48px; height: 1px;
+  background: var(--border2);
+  transition: background 0.4s ease;
+}
+.step-line.done { background: var(--accent); }
+
+/* Card */
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  overflow: hidden;
+  position: relative;
+}
+
+.card-header {
+  padding: 28px 28px 0;
+}
+.card-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+.card-tag-num {
+  background: rgba(212,255,78,0.12);
+  border: 1px solid rgba(212,255,78,0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 9px;
+}
+
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.card-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+
+.card-body { padding: 24px 28px 28px; }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 28px;
+}
+
+/* Task checklist */
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+  user-select: none;
+}
+.task:hover { border-color: var(--border2); }
+.task.done { border-color: rgba(78,255,180,0.2); background: rgba(78,255,180,0.04); }
+.task.done .task-circle { background: var(--success); border-color: var(--success); }
+.task.done .task-circle::after { opacity: 1; }
+.task.done .task-name { text-decoration: line-through; color: var(--muted); }
+.task.locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+.task-circle {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+  position: relative;
+}
+.task-circle::after {
+  content: '✓';
+  font-size: 11px;
+  color: #0B0B0A;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.task-info { flex: 1; }
+.task-name { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.3; margin-bottom: 2px; transition: all 0.25s; }
+.task-meta { font-size: 12px; color: var(--muted); }
+
+.task-action {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid rgba(212,255,78,0.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.task:hover .task-action { background: rgba(212,255,78,0.08); }
+.task.done .task-action { color: var(--success); border-color: rgba(78,255,180,0.2); }
+.task.done .task-action::before { content: 'Done'; }
+.task:not(.done) .task-action::before { content: 'Do it'; }
+
+/* Wallet input area */
+.wallet-area { margin-bottom: 16px; }
+
+.wallet-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.wallet-btn:hover { border-color: var(--accent); background: rgba(212,255,78,0.03); }
+.wallet-btn.connected {
+  border-color: rgba(78,255,180,0.3);
+  background: rgba(78,255,180,0.04);
+}
+
+.wallet-left { display: flex; align-items: center; gap: 12px; }
+.wallet-icon-wrap {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+}
+.wallet-label { font-weight: 500; font-size: 14px; color: var(--text); }
+.wallet-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+.wallet-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.wallet-status.idle { color: var(--muted); background: var(--surface); border: 1px solid var(--border); }
+.wallet-status.ok { color: var(--success); background: rgba(78,255,180,0.1); border: 1px solid rgba(78,255,180,0.2); }
+
+/* NFT mint card section */
+.nft-visual {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+.nft-art-wrap {
+  width: 72px; height: 72px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.nft-art-inner {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: #0B0B0A;
+  position: relative;
+  z-index: 1;
+}
+.nft-art-ring {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,255,78,0.2);
+  animation: spin 7s linear infinite;
+}
+.nft-art-ring2 {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,255,78,0.1);
+  animation: spin 12s linear infinite reverse;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.nft-details { flex: 1; }
+.nft-name { font-family: 'DM Serif Display', serif; font-size: 17px; margin-bottom: 2px; }
+.nft-chain { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.chain-badge { background: #1a52f5; border-radius: 3px; padding: 1px 5px; font-size: 9px; color: #fff; }
+
+.price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.price-left { font-size: 12px; color: var(--muted); }
+.price-right {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--accent);
+}
+.price-right span { font-size: 12px; color: var(--muted); }
+
+.eligibility {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(78,255,180,0.06);
+  border: 1px solid rgba(78,255,180,0.15);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--success);
+}
+.eligibility svg { flex-shrink: 0; }
+
+/* CTA button */
+.btn {
+  width: 100%;
+  padding: 15px 20px;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: -0.1px;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #0B0B0A;
+}
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(212,255,78,0.2); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); background: var(--surface2); }
+
+.btn-row { display: flex; flex-direction: column; gap: 8px; }
+
+/* Progress bar */
+.task-progress { margin: 16px 0 0; }
+.task-progress-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.task-progress-bar {
+  height: 2px;
+  background: var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.task-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Landing screen */
+.landing {
+  text-align: center;
+  max-width: 440px;
+  width: 100%;
+}
+.landing-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 5px 14px 5px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.landing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+.landing-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 44px;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.landing-title em { font-style: italic; color: var(--accent); display: block; }
+
+.landing-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 36px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.landing-desc strong { color: var(--text); font-weight: 500; }
+
+.landing-stats {
+  display: flex; justify-content: center; gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: var(--surface);
+}
+.landing-stat {
+  flex: 1;
+  padding: 16px 12px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.landing-stat:last-child { border-right: none; }
+.landing-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+.landing-stat-label { font-size: 11px; color: var(--muted); }
+
+.btn-landing {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #0B0B0A;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+  letter-spacing: -0.2px;
+}
+.btn-landing:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(212,255,78,0.18); }
+
+.landing-note { font-size: 12px; color: var(--muted2); }
+.landing-note a { color: var(--muted); }
+
+/* Success screen */
+.success-wrap { text-align: center; }
+.success-mark {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(78,255,180,0.1);
+  border: 1px solid rgba(78,255,180,0.25);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 26px;
+  animation: pop-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.success-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+.success-title em { color: var(--accent); font-style: italic; }
+.success-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+
+.success-pass {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 18px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+  text-align: left;
+}
+.success-nft-img {
+  width: 52px; height: 52px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.success-pass-info { flex: 1; }
+.success-pass-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+.success-pass-addr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.success-share-row { display: flex; gap: 8px; }
+.share-btn {
+  flex: 1; padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.share-btn:hover { border-color: var(--border2); background: var(--surface); }
+.share-btn.x-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+.share-btn.x-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* Countdown bar at bottom of page */
+.countdown-bar {
+  position: relative; z-index: 10;
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.cd-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.cd-timer {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+.cd-sep { color: var(--muted); }
+.cd-supply {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.cd-supply span { color: var(--accent); }
+
+/* Animations */
+.screen { animation: screen-in 0.4s ease forwards; }
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Wallet address display */
+.addr-display {
+  background: var(--surface2);
+  border: 1px solid rgba(78,255,180,0.2);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px;
+  gap: 10px;
+}
+.addr-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--success);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.addr-check { color: var(--success); font-size: 14px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 999;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Confetti particle */
+.confetti-wrap {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+.particle {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 1px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  from { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  to   { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  nav { padding: 16px 20px; }
+  .landing-title { font-size: 34px; }
+  .countdown-bar { flex-wrap: wrap; gap: 8px; }
+  .card { border-radius: var(--r-sm); }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">D</div>
+    Dankpad
+  </a>
+  <div class="nav-pill">
+    <div class="pill-dot"></div>
+    Waitlist open
+  </div>
+</nav>
+
+<!-- Main -->
+<main id="main">
+  <!-- Screens injected by JS -->
+</main>
+
+<!-- Countdown bar -->
+<div class="countdown-bar">
+  <div class="cd-label">Platform launch in</div>
+  <div class="cd-timer">
+    <span id="cd-d">45</span><span class="cd-sep">d</span>
+    <span id="cd-h">00</span><span class="cd-sep">h</span>
+    <span id="cd-m">00</span><span class="cd-sep">m</span>
+    <span id="cd-s">00</span><span class="cd-sep">s</span>
+  </div>
+  <div class="cd-supply">Supply: <span id="supplyCount">1,247</span> / 3,600 minted</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span>✦</span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- Confetti -->
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<script>
+/* =====================
+   State
+===================== */
+const state = {
+  screen: 'landing',   // landing | connect | tasks | mint | success
+  step: 0,
+  walletConnected: false,
+  walletAddress: '',
+  xConnected: false,
+  xHandle: '',
+  tasks: {
+    follow: false,
+    retweet: false,
+    telegram: false,
+  },
+  minted: false,
+};
+
+/* =====================
+   Screens
+===================== */
+const screens = {
+
+  landing: () => `
+    <div class="landing screen">
+      <div class="landing-tag">
+        <div class="landing-dot"></div>
+        Waitlist phase &nbsp;·&nbsp; Base network
+      </div>
+      <h1 class="landing-title">
+        The airdrop<br>
+        <em>launchpad.</em>
+      </h1>
+      <p class="landing-desc">
+        Mint a <strong>Dankpad Pass</strong> for $0.30. Complete tasks. Stack Dank Points.
+        Get first access to every project that launches through us.
+      </p>
+      <div class="landing-stats">
+        <div class="landing-stat">
+          <div class="landing-stat-val">$0.30</div>
+          <div class="landing-stat-label">Mint price</div>
+        </div>
+        <div class="landing-stat">
+          <div class="landing-stat-val" id="liveCount">1,247</div>
+          <div class="landing-stat-label">Minted</div>
+        </div>
+        <div class="landing-stat">
+          <div class="landing-stat-val">45d</div>
+          <div class="landing-stat-label">To launch</div>
+        </div>
+      </div>
+      <button class="btn-landing" onclick="go('connect')">Join Dankpad →</button>
+      <p class="landing-note">
+        Base network &nbsp;·&nbsp; ERC-721 &nbsp;·&nbsp; No royalties &nbsp;·&nbsp;
+        <a href="#">Docs</a>
+      </p>
+    </div>
+  `,
+
+  connect: () => `
+    <div class="screen">
+      <div class="steps-indicator" id="stepsIndicator">
+        ${stepHTML(1)}
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-tag"><span class="card-tag-num">01</span> Connect</div>
+          <h2 class="card-title">Link your<br><em>accounts</em></h2>
+          <p class="card-desc">Connect your Base wallet and X account to register for the waitlist.</p>
+        </div>
+        <div class="divider" style="margin-top:20px"></div>
+        <div class="card-body">
+          <div class="wallet-area">
+            <button class="wallet-btn ${state.walletConnected ? 'connected' : ''}" onclick="connectWallet()" id="walletBtn">
+              <div class="wallet-left">
+                <div class="wallet-icon-wrap">🦊</div>
+                <div>
+                  <div class="wallet-label">${state.walletConnected ? truncate(state.walletAddress) : 'Connect Base wallet'}</div>
+                  <div class="wallet-sub">${state.walletConnected ? 'Base mainnet' : 'MetaMask, Coinbase, WalletConnect'}</div>
+                </div>
+              </div>
+              <div class="wallet-status ${state.walletConnected ? 'ok' : 'idle'}">${state.walletConnected ? '✓ connected' : 'connect'}</div>
+            </button>
+            ${state.walletConnected ? `<div class="addr-display"><span class="addr-text">${state.walletAddress}</span><span class="addr-check">✓</span></div>` : ''}
+          </div>
+
+          <button class="wallet-btn ${state.xConnected ? 'connected' : ''}" onclick="connectX()" id="xBtn" style="margin-top:0">
+            <div class="wallet-left">
+              <div class="wallet-icon-wrap" style="font-size:15px">𝕏</div>
+              <div>
+                <div class="wallet-label">${state.xConnected ? '@' + state.xHandle : 'Connect X account'}</div>
+                <div class="wallet-sub">${state.xConnected ? 'Verified' : 'Required to verify tasks'}</div>
+              </div>
+            </div>
+            <div class="wallet-status ${state.xConnected ? 'ok' : 'idle'}">${state.xConnected ? '✓ connected' : 'connect'}</div>
+          </button>
+
+          <div style="margin-top:20px" class="btn-row">
+            <button class="btn btn-primary" onclick="go('tasks')" ${!state.walletConnected || !state.xConnected ? 'disabled' : ''} id="connectNextBtn">
+              Continue to tasks →
+            </button>
+            <button class="btn btn-ghost" onclick="go('landing')">← Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  tasks: () => {
+    const doneCount = Object.values(state.tasks).filter(Boolean).length;
+    const total = Object.keys(state.tasks).length;
+    const allDone = doneCount === total;
+    return `
+    <div class="screen">
+      <div class="steps-indicator">
+        ${stepHTML(2)}
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-tag"><span class="card-tag-num">02</span> Tasks</div>
+          <h2 class="card-title">Complete<br><em>the tasks</em></h2>
+          <p class="card-desc">Finish all tasks to unlock your NFT mint. Each task earns you Dank Points.</p>
+        </div>
+        <div class="divider" style="margin-top:20px"></div>
+        <div class="card-body">
+          <div class="task-list">
+
+            <div class="task ${state.tasks.follow ? 'done' : ''}" onclick="doTask('follow')">
+              <div class="task-circle"></div>
+              <div class="task-info">
+                <div class="task-name">Follow @dankpad on X</div>
+                <div class="task-meta">+500 Dank Points</div>
+              </div>
+              <div class="task-action"></div>
+            </div>
+
+            <div class="task ${state.tasks.retweet ? 'done' : ''} ${!state.tasks.follow ? 'locked' : ''}" onclick="doTask('retweet')">
+              <div class="task-circle"></div>
+              <div class="task-info">
+                <div class="task-name">Repost the announcement</div>
+                <div class="task-meta">+750 Dank Points</div>
+              </div>
+              <div class="task-action"></div>
+            </div>
+
+            <div class="task ${state.tasks.telegram ? 'done' : ''} ${!state.tasks.retweet ? 'locked' : ''}" onclick="doTask('telegram')">
+              <div class="task-circle"></div>
+              <div class="task-info">
+                <div class="task-name">Join Dankpad Telegram</div>
+                <div class="task-meta">+250 Dank Points</div>
+              </div>
+              <div class="task-action"></div>
+            </div>
+
+          </div>
+
+          <div class="task-progress">
+            <div class="task-progress-top">
+              <span>${doneCount} of ${total} tasks complete</span>
+              <span>${Math.round((doneCount/total)*100)}%</span>
+            </div>
+            <div class="task-progress-bar">
+              <div class="task-progress-fill" style="width:${(doneCount/total)*100}%"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px" class="btn-row">
+            <button class="btn btn-primary" onclick="go('mint')" ${!allDone ? 'disabled' : ''}>
+              ${allDone ? 'Proceed to mint →' : 'Complete all tasks to continue'}
+            </button>
+            <button class="btn btn-ghost" onclick="go('connect')">← Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `},
+
+  mint: () => `
+    <div class="screen">
+      <div class="steps-indicator">
+        ${stepHTML(3)}
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-tag"><span class="card-tag-num">03</span> Mint</div>
+          <h2 class="card-title">Mint your<br><em>pass</em></h2>
+          <p class="card-desc">You've completed all tasks. Mint your Dankpad Pass to secure your place.</p>
+        </div>
+        <div class="divider" style="margin-top:20px"></div>
+        <div class="card-body">
+
+          <div class="nft-visual">
+            <div class="nft-art-wrap">
+              <div class="nft-art-ring2"></div>
+              <div class="nft-art-ring"></div>
+              <div class="nft-art-inner">D</div>
+            </div>
+            <div class="nft-details">
+              <div class="nft-name">Dankpad Pass</div>
+              <div class="nft-chain">
+                <span class="chain-badge">Base</span>
+                ERC-721 &nbsp;·&nbsp; No royalties
+              </div>
+            </div>
+          </div>
+
+          <div class="price-row">
+            <div class="price-left">Mint price (per NFT)</div>
+            <div class="price-right">$0.30 <span>/ ~0.0001 ETH</span></div>
+          </div>
+
+          <div class="eligibility">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="#4EFFB4" stroke-width="1.2"/>
+              <path d="M5 8l2 2 4-4" stroke="#4EFFB4" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Wallet verified &nbsp;·&nbsp; Tasks complete &nbsp;·&nbsp; Eligible to mint
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="mintNFT()">
+              Mint Dankpad Pass
+            </button>
+            <button class="btn btn-ghost" onclick="go('tasks')">← Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  success: () => `
+    <div class="screen">
+      <div class="card" style="max-width:440px; width:100%">
+        <div class="card-body" style="padding-top:32px; padding-bottom:32px">
+          <div class="success-wrap">
+            <div class="success-mark">✦</div>
+            <h2 class="success-title">You're in.<br><em>Welcome.</em></h2>
+            <p class="success-desc">
+              Your Dankpad Pass has been minted on Base.
+              Tasks drop in week 5. Your 1,500 Dank Points are already stacking.
+            </p>
+
+            <div class="success-pass">
+              <div class="success-nft-img">D</div>
+              <div class="success-pass-info">
+                <div class="success-pass-name">Dankpad Pass #1247</div>
+                <div class="success-pass-addr">${truncate(state.walletAddress || '0x000...0000')}</div>
+              </div>
+            </div>
+
+            <div class="success-share-row">
+              <button class="share-btn x-btn" onclick="shareOnX()">
+                𝕏 Share on X
+              </button>
+              <button class="share-btn" onclick="showToast('Basescan link coming soon!')">
+                View on Basescan ↗
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+};
+
+/* =====================
+   Step indicator HTML
+===================== */
+function stepHTML(active) {
+  const labels = ['Connect', 'Tasks', 'Mint'];
+  let html = '';
+  labels.forEach((l, i) => {
+    const num = i + 1;
+    const cls = num < active ? 'done' : num === active ? 'active' : '';
+    const inner = num < active ? '✓' : num;
+    html += `<div class="step-pip ${cls}" title="${l}">${inner}</div>`;
+    if (i < labels.length - 1) {
+      html += `<div class="step-line ${num < active ? 'done' : ''}"></div>`;
+    }
+  });
+  return html;
+}
+
+/* =====================
+   Navigation
+===================== */
+function go(screen) {
+  state.screen = screen;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function render() {
+  document.getElementById('main').innerHTML = screens[state.screen]();
+}
+
+/* =====================
+   Connect wallet (simulated)
+===================== */
+function connectWallet() {
+  if (state.walletConnected) return;
+  showToast('Connecting wallet...');
+  setTimeout(() => {
+    state.walletConnected = true;
+    state.walletAddress = '0x' + [...Array(40)].map(() => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+    render();
+    showToast('Wallet connected!');
+  }, 1200);
+}
+
+function connectX() {
+  if (state.xConnected) return;
+  showToast('Redirecting to X...');
+  setTimeout(() => {
+    state.xConnected = true;
+    state.xHandle = 'degen_user';
+    render();
+    showToast('@degen_user connected!');
+  }, 1400);
+}
+
+/* =====================
+   Tasks
+===================== */
+const taskKeys = ['follow', 'retweet', 'telegram'];
+const taskLinks = {
+  follow: 'https://x.com/dankpad',
+  retweet: 'https://x.com/dankpad',
+  telegram: 'https://t.me/dankpad',
+};
+
+function doTask(key) {
+  if (state.tasks[key]) return;
+  const idx = taskKeys.indexOf(key);
+  const prev = taskKeys[idx - 1];
+  if (prev && !state.tasks[prev]) return;
+
+  showToast('Opening link...');
+  window.open(taskLinks[key] || '#', '_blank');
+
+  setTimeout(() => {
+    state.tasks[key] = true;
+    render();
+    showToast('Task verified!');
+  }, 1800);
+}
+
+/* =====================
+   Mint
+===================== */
+function mintNFT() {
+  const btn = document.querySelector('.btn-primary');
+  if (btn) { btn.textContent = 'Minting...'; btn.disabled = true; }
+
+  showToast('Sending transaction on Base...');
+  setTimeout(() => {
+    state.minted = true;
+    state.screen = 'success';
+    render();
+    confetti();
+    updateSupply();
+  }, 2200);
+}
+
+/* =====================
+   Share
+===================== */
+function shareOnX() {
+  const text = encodeURIComponent("Just minted my Dankpad Pass — the fair airdrop launchpad on Base 🔥\n\nJoin the waitlist: dankpad.xyz\n\n@dankpad #Dankpad #Base");
+  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
+}
+
+/* =====================
+   Countdown
+===================== */
+const end = Date.now() + 45 * 24 * 60 * 60 * 1000;
+function tick() {
+  const diff = Math.max(0, end - Date.now());
+  document.getElementById('cd-d').textContent = String(Math.floor(diff / 86400000)).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+/* =====================
+   Supply ticker
+===================== */
+let supply = 1247;
+function updateSupply() { supply++; document.getElementById('supplyCount').textContent = supply.toLocaleString(); }
+setInterval(() => {
+  if (Math.random() > 0.55) { updateSupply(); }
+}, 5000);
+
+/* =====================
+   Toast
+===================== */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* =====================
+   Confetti
+===================== */
+function confetti() {
+  const wrap = document.getElementById('confettiWrap');
+  const colors = ['#D4FF4E','#4EFFB4','#FFFFFF','#FFD44E','#FF8C4E'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.width = p.style.height = (Math.random() * 6 + 4) + 'px';
+    p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+    p.style.animationDelay = (Math.random() * 0.8) + 's';
+    wrap.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+}
+
+/* =====================
+   Helpers
+===================== */
+function truncate(addr) {
+  if (!addr || addr.length < 12) return addr;
+  return addr.slice(0, 6) + '...' + addr.slice(-4);
+}
+
+/* =====================
+   Init
+===================== */
+render();
+</script>
+</body>
+</html>
